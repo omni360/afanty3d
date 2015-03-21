@@ -15,7 +15,57 @@ afanty3d.stateViewed = 0;
 afanty3d.statePlaced = 1;
 afanty3d.stateModified = 2;
 
+//afanty3d domObject
+afanty3d.domObject = function() {
 
+}
+
+//afanty3d scene init
+afanty3d.scene = function () {
+
+	this.parentdomclass = "";
+	this.parentdomid = "";
+	// this.scene = "";
+
+
+};
+
+afanty3d.scene.prototype.constructor = afanty3d.scene;
+afanty3d.scene.prototype.init = function() {
+
+
+};
+
+afanty3d.scene.prototype.appendtodomid = function (domid) {
+
+};
+
+afanty3d.scene.prototype.appendtodomclass = function (domclass) {
+
+	
+
+
+};
+
+
+//afanty3d logo
+afanty3d.afanty3dlogo = function() {
+
+	this.parentdomclass = "";
+	this.parentdomid = "";
+	this.scene = "";
+
+};
+
+afanty3d.afanty3dlogo.prototype.init = function	() {
+
+
+};
+
+// afanty3d.afanty3dlogo.prototype = Object.create( );
+afanty3d.afanty3dlogo.prototype.constructor = afanty3d.afanty3dlogo;
+
+//afanty3d state manager
 afanty3d.stateManager = function () {
 
 		// place command started
@@ -33,7 +83,8 @@ afanty3d.stateManager = function () {
 		this.activeState = afanty3d.stateViewed;
 
 
-}
+};
+
 afanty3d.stateManager.prototype = {
 
 	constructor: afanty3d.stateManager,
@@ -50,11 +101,9 @@ afanty3d.stateManager.prototype = {
 		
 	},
 
+};
 
-}
-
-
-
+//afanty3d signal manager
 afanty3d.signalManager = function () {
 
 		// script
@@ -117,8 +166,10 @@ afanty3d.signalManager = function () {
 		showGridChanged: new SIGNALS.Signal()
 
 
-}
+};
+
+
 
 afanty3d.sceneInit = function(){
 
-}
+};
