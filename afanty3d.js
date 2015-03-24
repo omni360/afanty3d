@@ -49,7 +49,7 @@ afanty3d.scene.prototype.appendtodomclass = function (domclass) {
 /*
 @length 
 */
-afanty3d.packagegeomety = function(depth, width, height,bevel,revers) {
+afanty3d.packagegeomety = function(depth, width, height, round, revers, thinkness, options) {
 
 	THREE.Geometry.call(this);
 
@@ -58,116 +58,182 @@ afanty3d.packagegeomety = function(depth, width, height,bevel,revers) {
 	this.depth = depth != undefined ? depth : 200;
 	this.width = width != undefined ? width : 100;
 	this.height = height != undefined ? height : 60;
-	this.bevel = bevel != undefined ? bevel : 10;
+	this.round = round != undefined ? round : 10;
 	this.revers = revers != undefined ? revers : 1;
+	this.thinkness = thinkness != undefined ? thinkness : 0.6;
+	this.extrudeSettings = options != undefined ? options : undefined;
+	// this.packagePath = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
+	this.packageSection = this.packagesection( 0, 0, height, revers, thinkness);
+	this.extrudePath = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
+	// this.extrudePath.rotation.x = Math.PI / 2;
 
-	this.widthSegments =  1;
-	this.heightSegments =  1;
-	this.depthSegments =  1;
+		var packageGeo = new THREE.ExtrudeGeometry( this.packageSection , this.extrudeSettings );
 
-	var scope = this;
+		return packageGeo;
+	// this.widthSegments =  1;
+	// this.heightSegments =  1;
+	// this.depthSegments =  1;
 
-	var width_half = width / 2;
-	var height_half = height / 2;
-	var depth_half = depth / 2;
+	// var scope = this;
 
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
+	// var width_half = width / 2;
+	// var height_half = height / 2;
+	// var depth_half = depth / 2;
 
-	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
+	// buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
+	// buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
+	// buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
+	// buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
+	// buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
+	// buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
 
-		var w, ix, iy,
-		gridX = scope.widthSegments,
-		gridY = scope.heightSegments,
-		width_half = width / 2,
-		height_half = height / 2,
-		offset = scope.vertices.length;
+	// function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
-		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
+	// 	var w, ix, iy,
+	// 	gridX = scope.widthSegments,
+	// 	gridY = scope.heightSegments,
+	// 	width_half = width / 2,
+	// 	height_half = height / 2,
+	// 	offset = scope.vertices.length;
 
-			w = 'z';
+	// 	if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
-		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
+	// 		w = 'z';
 
-			w = 'y';
-			gridY = scope.depthSegments;
+	// 	} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
-		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
+	// 		w = 'y';
+	// 		gridY = scope.depthSegments;
 
-			w = 'x';
-			gridX = scope.depthSegments;
+	// 	} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
-		}
+	// 		w = 'x';
+	// 		gridX = scope.depthSegments;
 
-		var gridX1 = gridX + 1,
-		gridY1 = gridY + 1,
-		segment_width = width / gridX,
-		segment_height = height / gridY,
-		normal = new THREE.Vector3();
+	// 	}
 
-		normal[ w ] = depth > 0 ? 1 : - 1;
+	// 	var gridX1 = gridX + 1,
+	// 	gridY1 = gridY + 1,
+	// 	segment_width = width / gridX,
+	// 	segment_height = height / gridY,
+	// 	normal = new THREE.Vector3();
 
-		for ( iy = 0; iy < gridY1; iy ++ ) {
+	// 	normal[ w ] = depth > 0 ? 1 : - 1;
 
-			for ( ix = 0; ix < gridX1; ix ++ ) {
+	// 	for ( iy = 0; iy < gridY1; iy ++ ) {
 
-				var vector = new THREE.Vector3();
-				vector[ u ] = ( ix * segment_width - width_half ) * udir;
-				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
-				vector[ w ] = depth;
+	// 		for ( ix = 0; ix < gridX1; ix ++ ) {
 
-				scope.vertices.push( vector );
+	// 			var vector = new THREE.Vector3();
+	// 			vector[ u ] = ( ix * segment_width - width_half ) * udir;
+	// 			vector[ v ] = ( iy * segment_height - height_half ) * vdir;
+	// 			vector[ w ] = depth;
 
-			}
+	// 			scope.vertices.push( vector );
 
-		}
+	// 		}
 
-		for ( iy = 0; iy < gridY; iy ++ ) {
+	// 	}
 
-			for ( ix = 0; ix < gridX; ix ++ ) {
+	// 	for ( iy = 0; iy < gridY; iy ++ ) {
 
-				var a = ix + gridX1 * iy;
-				var b = ix + gridX1 * ( iy + 1 );
-				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-				var d = ( ix + 1 ) + gridX1 * iy;
+	// 		for ( ix = 0; ix < gridX; ix ++ ) {
 
-				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
-				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
+	// 			var a = ix + gridX1 * iy;
+	// 			var b = ix + gridX1 * ( iy + 1 );
+	// 			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+	// 			var d = ( ix + 1 ) + gridX1 * iy;
 
-				var face = new THREE.Face3( a + offset, b + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
+	// 			var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
+	// 			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
+	// 			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
+	// 			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
 
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+	// 			var face = new THREE.Face3( a + offset, b + offset, d + offset );
+	// 			face.normal.copy( normal );
+	// 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+	// 			face.materialIndex = materialIndex;
 
-				face = new THREE.Face3( b + offset, c + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
+	// 			scope.faces.push( face );
+	// 			scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+	// 			face = new THREE.Face3( b + offset, c + offset, d + offset );
+	// 			face.normal.copy( normal );
+	// 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+	// 			face.materialIndex = materialIndex;
 
-			}
+	// 			scope.faces.push( face );
+	// 			scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
-		}
+	// 		}
 
-	}
+	// 	}
 
-	this.mergeVertices();
+	// }
+
+	// this.mergeVertices();
+	// this.createPackage();
 
 };
 
 afanty3d.packagegeomety.prototype = Object.create( THREE.Geometry.prototype );
 afanty3d.packagegeomety.prototype.constructor = afanty3d.packagegeomety;
+// got package round rect path.
+afanty3d.packagegeomety.prototype.roundRectPath = function ( x, y, depth, width, round){
+
+	var ctx = new THREE.Shape();
+
+	ctx.moveTo( x, y + round );
+	ctx.lineTo( x, y + width - round );
+	ctx.quadraticCurveTo( x, y + width, x + round, y + width );
+	ctx.lineTo( x + depth - round, y + width) ;
+	ctx.quadraticCurveTo( x + depth, y + width, x + depth, y + width - round );
+	ctx.lineTo( x + depth, y + round );
+	ctx.quadraticCurveTo( x + depth, y, x + depth - round, y );
+	ctx.lineTo( x + round, y );
+	ctx.quadraticCurveTo( x, y, x, y + round );
+
+	var extpath = ctx.createPointsGeometry();
+	extpath.rotateX(Math.PI / 2);
+	// var tmp = ctx.createPointsGeometry();
+	// var pts = [];
+	// for(var i = 0, tl = tmp.vertices.length; i < tl; i++) {
+
+	// 	var axis = new THREE.Vector3( 0, 1, 0 ).normalize();
+	// 	var tmpver = tmp.vertices[i].applyAxisAngle(axis, Math.PI / 2).clone;
+	// 	pts.push( tmpver );
+	// }
+	// var extpath = new THREE.ClosedSplineCurve3(pts);
+
+	return extpath;
+
+};
+// got package section path.
+afanty3d.packagegeomety.prototype.packagesection = function (x, y, height, revers, thinkness) {
+
+	var ctx = new THREE.Shape();
+
+	ctx.moveTo( x, y + revers);
+	ctx.quadraticCurveTo( x, y + revers * 2, x - revers, y + revers * 2 );
+	ctx.quadraticCurveTo( x - revers * 2, y + revers * 2, x - revers * 2, y + revers * 3 );
+	ctx.quadraticCurveTo( x - revers * 2, y + revers * 4, x - revers, y + revers * 4 );
+	ctx.quadraticCurveTo( x, y + revers * 4, x , y + revers * 3 );
+	ctx.moveTo( x, y + revers * 2 );
+	ctx.lineTo( x, y + height - revers * 3 );
+	ctx.quadraticCurveTo( x, y + height - revers * 2, x - revers, y + height - revers * 2 );
+	ctx.quadraticCurveTo( x - revers * 2, y + height - revers * 2, x - revers * 2, y + height - revers * 3 );
+	ctx.quadraticCurveTo( x - revers * 2, y + height - revers * 4, x - revers, y + height - revers * 4 );
+	ctx.quadraticCurveTo( x, y + height - revers * 4, x , y + height - revers * 3 );
+
+	return ctx;
+
+};
+// create package geometry.
+afanty3d.packagegeomety.prototype.createPackage = function() {
+
+	var packageGeo = new THREE.ExtrudeGeometry( this.packageSection , this.extrudeSettings );
+	// this
+};
 
 
 //afanty3d logo
