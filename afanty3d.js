@@ -193,17 +193,22 @@ afanty3d.packagegeomety.prototype.roundRectPath = function ( x, y, depth, width,
 	ctx.lineTo( x + round, y );
 	ctx.quadraticCurveTo( x, y, x, y + round );
 
-	var extpath = ctx.createPointsGeometry();
-	extpath.rotateX(Math.PI / 2);
-	// var tmp = ctx.createPointsGeometry();
-	// var pts = [];
-	// for(var i = 0, tl = tmp.vertices.length; i < tl; i++) {
+	// var extpath = ctx.createPointsGeometry();
+	// extpath.rotateX(Math.PI / 2);
+	var tmp = ctx.createPointsGeometry();
+	var pts = [];
+	for(var i = 0, tl = tmp.vertices.length; i < tl; i++) {
 
-	// 	var axis = new THREE.Vector3( 0, 1, 0 ).normalize();
-	// 	var tmpver = tmp.vertices[i].applyAxisAngle(axis, Math.PI / 2).clone;
-	// 	pts.push( tmpver );
-	// }
-	// var extpath = new THREE.ClosedSplineCurve3(pts);
+		var axis = new THREE.Vector3( 0, 1, 1 );
+		// axis.normalize();
+		console.log(tmp.vertices[i]);
+		var q1 = new THREE.Quaternion();
+		q1.setFromAxisAngle( axis,  Math.PI / 2 );
+		var tmpver = tmp.vertices[i].applyQuaternion( q1 );
+		console.log(tmpver);
+		pts.push( tmpver );
+	}
+	var extpath = new THREE.ClosedSplineCurve3(pts);
 
 	return extpath;
 
