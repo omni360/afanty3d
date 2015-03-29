@@ -62,12 +62,25 @@ afanty3d.packagegeomety = function(depth, width, height, round, revers, thinknes
 	this.revers = revers != undefined ? revers : 1;
 	this.thinkness = thinkness != undefined ? thinkness : 0.6;
 	this.extrudeSettings = options != undefined ? options : undefined;
-	// this.packagePath = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
-	this.packageSection = this.packagesection( 0, 0, height, revers, thinkness);
-	this.extrudePath = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
+	var a = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
+	this.packageSection = this.reversPath( 0, 0, revers );
+	// this.packageSection = this.packagesection( 0, 0, height, revers, thinkness);
+	// this.extrudePath = this.roundRectPath( 0, 0, this.depth, this.width, this.round);
 	// this.extrudePath.rotation.x = Math.PI / 2;
-
-		var packageGeo = new THREE.ExtrudeGeometry( this.packageSection , this.extrudeSettings );
+					var closedSpline = new THREE.ClosedSplineCurve3( [
+					new THREE.Vector3( -60, -100,  60 ),
+					new THREE.Vector3( -60,   20,  60 ),
+					new THREE.Vector3( -60,  120,  60 ),
+					new THREE.Vector3(  60,   20, -60 ),
+					new THREE.Vector3(  60, -100, -60 )
+				] );
+	var extrudeSettingsv = {
+						steps			: 200,
+						bevelEnabled	: false,
+						extrudePath		: a
+					};
+		// var packageGeo = new THREE.ExtrudeGeometry( this.packageSection, extrudeSettingsv );
+		var packageGeo = new THREE.ExtrudeGeometry( this.packageSection, extrudeSettingsv );
 
 		return packageGeo;
 	// this.widthSegments =  1;
@@ -196,21 +209,32 @@ afanty3d.packagegeomety.prototype.roundRectPath = function ( x, y, depth, width,
 	// var extpath = ctx.createPointsGeometry();
 	// extpath.rotateX(Math.PI / 2);
 	var tmp = ctx.createPointsGeometry();
-	var pts = [];
-	for(var i = 0, tl = tmp.vertices.length; i < tl; i++) {
+	var spl = new THREE.ClosedSplineCurve3( tmp.vertices );
+	// var pts = [];
+	// for(var i = 0, tl = tmp.vertices.length; i < tl; i++) {
 
-		var axis = new THREE.Vector3( 0, 1, 1 );
-		// axis.normalize();
-		console.log(tmp.vertices[i]);
-		var q1 = new THREE.Quaternion();
-		q1.setFromAxisAngle( axis,  Math.PI / 2 );
-		var tmpver = tmp.vertices[i].applyQuaternion( q1 );
-		console.log(tmpver);
-		pts.push( tmpver );
-	}
-	var extpath = new THREE.ClosedSplineCurve3(pts);
-
-	return extpath;
+	// 	// var axis = new THREE.Vector3( 0, 1, 1 );
+	// 	// // axis.normalize();
+	// 	// console.log(tmp.vertices[i]);
+	// 	// var q1 = new THREE.Quaternion();
+	// 	// q1.setFromAxisAngle( axis,  Math.PI / 2 );
+	// 	// var tmpver = tmp.vertices[i].applyQuaternion( q1 );
+	// 	// console.log(tmpver);
+	// 	// pts.push( tmpver );
+	// 	// var axis = new THREE.Vector3( 0, 1, 1 );
+	// 	// axis.normalize();
+	// 	console.log(tmp.vertices[i]);
+	// 	var tmpver = tmp.vertices[i];
+	// 	var ttt = tmpver.x;
+	// 	tmpver.x = tmpver.z;
+	// 	tmpver.y = 0;
+	// 	tmpver.z = ttt;
+	// 	console.log(tmpver);
+	// 	pts.push( tmpver );
+	// }
+	// var extpath = new THREE.ClosedSplineCurve3(pts);
+	// return ctx;
+	return spl;
 
 };
 // got package section path.
@@ -218,17 +242,40 @@ afanty3d.packagegeomety.prototype.packagesection = function (x, y, height, rever
 
 	var ctx = new THREE.Shape();
 
-	ctx.moveTo( x, y + revers);
-	ctx.quadraticCurveTo( x, y + revers * 2, x - revers, y + revers * 2 );
-	ctx.quadraticCurveTo( x - revers * 2, y + revers * 2, x - revers * 2, y + revers * 3 );
-	ctx.quadraticCurveTo( x - revers * 2, y + revers * 4, x - revers, y + revers * 4 );
-	ctx.quadraticCurveTo( x, y + revers * 4, x , y + revers * 3 );
-	ctx.moveTo( x, y + revers * 2 );
-	ctx.lineTo( x, y + height - revers * 3 );
-	ctx.quadraticCurveTo( x, y + height - revers * 2, x - revers, y + height - revers * 2 );
-	ctx.quadraticCurveTo( x - revers * 2, y + height - revers * 2, x - revers * 2, y + height - revers * 3 );
-	ctx.quadraticCurveTo( x - revers * 2, y + height - revers * 4, x - revers, y + height - revers * 4 );
-	ctx.quadraticCurveTo( x, y + height - revers * 4, x , y + height - revers * 3 );
+	ctx.moveTo( x + revers, y );
+	ctx.quadraticCurveTo( x + revers * 2, y, x + revers * 2 , y - revers );
+	ctx.quadraticCurveTo( x + revers * 2, y  - revers * 2, x + revers, y - revers * 2 );
+	ctx.quadraticCurveTo( x , y - revers * 2, x , y - revers );
+	ctx.quadraticCurveTo( x, y , x  + revers, y);
+	ctx.moveTo( x + revers * 2, y );
+	ctx.lineTo( x + height - revers * 3, y );
+	ctx.quadraticCurveTo( x + height - revers * 2, y , x + height - revers * 2, y - revers );
+	ctx.quadraticCurveTo( x + height - revers * 2, y - revers * 2, x + height - revers * 3, y - revers * 2 );
+	ctx.quadraticCurveTo( x + height - revers * 4, y - revers * 2, x + height - revers * 4, y - revers);
+	ctx.quadraticCurveTo( x + height - revers * 4, y , x + height - revers * 3 , y );
+	ctx.lineTo( x  + revers, y );
+
+	return ctx;
+
+};
+
+// got package revers path.
+afanty3d.packagegeomety.prototype.reversPath = function (x, y,  revers ) {
+
+	var ctx = new THREE.Shape();
+	ctx.moveTo( x, y );
+	// ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise ) 
+	ctx.ellipse( x, y, revers, revers, 0, Math.PI * 2, true);
+	// ctx.quadraticCurveTo( x + revers * 2, y  - revers * 2, x + revers, y - revers * 2 );
+	// ctx.quadraticCurveTo( x , y - revers * 2, x , y - revers );
+	// ctx.quadraticCurveTo( x, y , x  + revers, y);
+	// ctx.moveTo( x + revers * 2, y );
+	// ctx.lineTo( x + height - revers * 3, y );
+	// ctx.quadraticCurveTo( x + height - revers * 2, y , x + height - revers * 2, y - revers );
+	// ctx.quadraticCurveTo( x + height - revers * 2, y - revers * 2, x + height - revers * 3, y - revers * 2 );
+	// ctx.quadraticCurveTo( x + height - revers * 4, y - revers * 2, x + height - revers * 4, y - revers);
+	// ctx.quadraticCurveTo( x + height - revers * 4, y , x + height - revers * 3 , y );
+	// ctx.lineTo( x  + revers, y );
 
 	return ctx;
 
