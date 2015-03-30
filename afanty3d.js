@@ -75,9 +75,9 @@ afanty3d.packagegeomety = function(depth, width, height, round, revers, thinknes
 					new THREE.Vector3(  60, -100, -60 )
 				] );
 	var extrudeSettingsv = {
-						steps			: 200,
+						steps			: 500,
 						bevelEnabled	: false,
-						extrudePath		: a
+						extrudePath		: closedSpline
 					};
 		// var packageGeo = new THREE.ExtrudeGeometry( this.packageSection, extrudeSettingsv );
 		var packageGeo = new THREE.ExtrudeGeometry( this.packageSection, extrudeSettingsv );
@@ -206,6 +206,15 @@ afanty3d.packagegeomety.prototype.roundRectPath = function ( x, y, depth, width,
 	ctx.lineTo( x + round, y );
 	ctx.quadraticCurveTo( x, y, x, y + round );
 
+	// ctx.moveTo( x, y + round );
+	// ctx.lineTo( x, y + width - round );
+	// ctx.quadraticCurveTo( x, y + width, x + round, y + width );
+	// ctx.lineTo( x + depth - round, y + width) ;
+	// ctx.quadraticCurveTo( x + depth, y + width, x + depth, y + width - round );
+	// ctx.lineTo( x + depth, y + round );
+	// ctx.quadraticCurveTo( x + depth, y, x + depth - round, y );
+	// ctx.lineTo( x + round, y );
+	// ctx.quadraticCurveTo( x, y, x, y + round );
 	// var extpath = ctx.createPointsGeometry();
 	// extpath.rotateX(Math.PI / 2);
 	var tmp = ctx.createPointsGeometry();
